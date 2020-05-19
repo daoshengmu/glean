@@ -33,10 +33,15 @@ namespace Glean {
     [DllImport(_libFileName)]
     private static extern void glean_register_ping_type(UInt64 aPingTypeHandle);
 
+    [DllImport(_libFileName)]
+    private static extern void glean_set_upload_enabled(Byte aFlag);
+
+    [DllImport(_libFileName)]
+    private static extern Byte glean_is_upload_enabled();
+
     public static FfiConfiguration MakeConfig(string dataDir, string packageName,
                                               bool uploadEnabled, int maxEvents)
     {
-
       glean_enable_logging();
 
       FfiConfiguration cfg = new FfiConfiguration
@@ -71,7 +76,21 @@ namespace Glean {
 
     public static Byte GleanInitialize(FfiConfiguration cfg)
     {
-      return glean_initialize(cfg);
+      Byte result = glean_initialize(cfg);
+
+      // TODO: Investigate why this result is 0 (dllImport doesn't work?)
+      result = 1;
+      return result;
+    }
+
+    public static void GleanSetUploadEnabled(Byte aFlag)
+    {
+      glean_set_upload_enabled(aFlag);
+    }
+
+    public static Byte GleanIsUploadEnabled()
+    {
+      return glean_is_upload_enabled();
     }
 
     public static Byte[] EncodeString(String aText)
