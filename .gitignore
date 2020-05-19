@@ -42,3 +42,6 @@ samples/ios/app/.venv/
 .coverage
 htmlcov/
 *.log
+glean-core/csharp/demo/.vs/
+glean-core/csharp/glean/obj/
+glean-core/csharp/demo/demo/obj/
