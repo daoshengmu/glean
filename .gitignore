@@ -45,3 +45,5 @@ htmlcov/
 glean-core/csharp/demo/.vs/
 glean-core/csharp/glean/obj/
 glean-core/csharp/demo/demo/obj/
+glean-core/csharp/demo/demo/bin/x64/Debug/
+glean-core/csharp/glean/bin/x64/Debug/

@@ -3,36 +3,52 @@ using System;
 using System.Collections.Generic;
 //using System.Collections.Generic;
 //using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
 
 namespace Glean.Metrics
 {
   public class PingType
   {
-    private String _name;
+    private string _name;
     private bool _includeClientId;
     private bool _sendIfEmpty;
-    private List<String> _reasonCodes = new List<String>();
+    private List<string> _reasonCodes = new List<string>();
     private UInt64 _handle;
-    
-    public PingType(String aName, bool aIncludeClientId, bool aSendIfEmpty, List<String> aReasonCodes)
+
+    internal PingType(string aName, bool aIncludeClientId, bool aSendIfEmpty, List<string> aReasonCodes)
     {
       _name = aName;
       _includeClientId = aIncludeClientId;
       _sendIfEmpty = aSendIfEmpty;
       _reasonCodes = aReasonCodes;
-      _handle = Ffi.NewPingType(Ffi.EncodeString(aName), aIncludeClientId, aSendIfEmpty, Ffi.EncodeVectorString(aReasonCodes),
+      
+      _handle = Ffi.NewPingType(aName, aIncludeClientId == true ? (byte)1 : (byte)0,
+                                aSendIfEmpty == true ? (byte)1 : (byte)0, aReasonCodes,
         aReasonCodes.Count);
 
-      // TOD:
+      // TODO:
       Glean.RegisterPingType(this);
     }
 
-    public UInt64 Handle()
+    internal UInt64 Handle()
     {
       return _handle;
     }
-    // Destructor... destroy pings
+
+    internal string Name()
+    {
+      return _name;
+    }
+
+    public void Submit(int? reason)
+    {
+      string reasonString = null;
+
+      if (reason != null)
+      {
+        reasonString = _reasonCodes[(int)reason];
+      }
+
+      Glean.SubmitPing(this, reasonString);
+    }
   }
 }

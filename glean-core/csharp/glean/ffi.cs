@@ -1,101 +1,110 @@
 
+using Glean.Net;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Glean {
-  class Ffi {
-
-    public class FfiConfiguration
-    {
-      public byte[] data_dir;
-      public byte[] package_name;
-      public bool upload_enabled;
-      public Int32 max_events;
-      public bool delay_ping_lifetime_io;
-    }
+  internal class Ffi {
 
     [DllImport(_libFileName)]
     private static extern void glean_enable_logging();
 
-    [DllImport(_libFileName)]
-    private static extern Byte glean_initialize(FfiConfiguration cfg);
+    [DllImport(_libFileName, CallingConvention = CallingConvention.Cdecl)]
+    private static extern byte glean_initialize(FfiConfiguration cfg);
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal class FfiConfiguration
+    {
+      internal string data_dir;
+      internal string package_name;
+      internal bool upload_enabled;
+      internal Int32 max_events;
+      internal bool delay_ping_lifetime_io;
+    }
 
     // TODO: Check if aPingName and aReasonCodes work
     // (https://github.com/mozilla/glean/blob/61c542ed822e39b589fcc5b43d824d8bbf5ea693/glean-core/ffi/src/ping_type.rs#L19)
     [DllImport(_libFileName)]
-    private static extern UInt64 glean_new_ping_type(Byte[] aPingName, bool aIncludeClientId, bool aSendIfEmpty,
-                                                     Byte[] aReasonCodes, Int32 aReasonCodesLen);
+    private static extern UInt64 glean_new_ping_type(string aPingName, byte aIncludeClientId, byte aSendIfEmpty,
+                                                     string[] aReasonCodes, int aReasonCodesLen);
 
     [DllImport(_libFileName)]
     private static extern void glean_register_ping_type(UInt64 aPingTypeHandle);
 
     [DllImport(_libFileName)]
-    private static extern void glean_set_upload_enabled(Byte aFlag);
+    private static extern void glean_set_upload_enabled(byte aFlag);
 
     [DllImport(_libFileName)]
-    private static extern Byte glean_is_upload_enabled();
+    private static extern byte glean_is_upload_enabled();
 
-    public static FfiConfiguration MakeConfig(string dataDir, string packageName,
+    [DllImport(_libFileName)]
+    private static extern byte glean_on_ready_to_submit_pings();
+
+    [DllImport(_libFileName)]
+    private static extern byte glean_submit_ping_by_name(string aPingName, string aReason);
+
+    [DllImport(_libFileName)]
+    private static extern void glean_get_upload_task(ref FfiPingUploadTask aUploadTask);
+
+    [DllImport(_libFileName)]
+    private static extern byte glean_is_first_run();
+
+    [DllImport(_libFileName)]
+    private static extern void glean_clear_application_lifetime_metrics();
+
+    [DllImport(_libFileName)]
+    private static extern void glean_get_upload_task(ref FfiPingUploadTask result, byte log_ping);
+
+
+    internal class Constants
+    {
+      // A recoverable error.
+      static internal int UPLOAD_RESULT_RECOVERABLE = 0x1;
+
+      // An unrecoverable error.
+      static internal int UPLOAD_RESULT_UNRECOVERABLE = 0x2;
+
+      // A HTTP response code.
+      static internal int UPLOAD_RESULT_HTTP_STATUS = 0x8000;
+    }
+
+    internal static FfiConfiguration MakeConfig(string dataDir, string packageName,
                                               bool uploadEnabled, int maxEvents)
     {
       glean_enable_logging();
 
       FfiConfiguration cfg = new FfiConfiguration
       {
-        data_dir = EncodeString(dataDir),
-        package_name = EncodeString(packageName),
+        data_dir = dataDir,
+        package_name = packageName,
         upload_enabled = uploadEnabled,
         max_events = maxEvents,
         delay_ping_lifetime_io = false
       };
 
-        //    Marshal.Prelink(glean_initialize);
-     // Byte b = glean_initialize(cfg);
-
-     // string strDllPath = Path.GetFullPath(_libFileName);
-      //  if (File.Exists(strDllPath))
-      //  {
-      //    try
-      //    {
-      //      Assembly DLL = Assembly.LoadFile(strDllPath);
-      //    } catch (BadImageFormatException e) {
-      //        Console.WriteLine("Unable to load {0}.", _libFileName);
-      //        Console.WriteLine(e.Message.Substring(0,
-      //                          e.Message.IndexOf(".") + 1));
-      //    }
-
-      ////    Type classType = DLL.GetType(String.Format("{0}.{1}", strNmSpaceNm, strClassNm));
-
-      //  }
       return cfg;
     }
 
-    public static Byte GleanInitialize(FfiConfiguration cfg)
+    internal static bool GleanInitialize(FfiConfiguration cfg)
     {
-      Byte result = glean_initialize(cfg);
-
-      // TODO: Investigate why this result is 0 (dllImport doesn't work?)
-      result = 1;
-      return result;
+      return glean_initialize(cfg) != 0;
     }
 
-    public static void GleanSetUploadEnabled(Byte aFlag)
+    internal static void GleanSetUploadEnabled(byte aFlag)
     {
       glean_set_upload_enabled(aFlag);
     }
 
-    public static Byte GleanIsUploadEnabled()
+    internal static byte GleanIsUploadEnabled()
     {
       return glean_is_upload_enabled();
     }
 
-    public static Byte[] EncodeString(String aText)
+    internal static byte[] EncodeString(string aText)
     {
-      if (aText.Length == 0)
+      if (aText == null || aText.Length == 0)
       {
         return null;
       }
@@ -103,36 +112,62 @@ namespace Glean {
       return utf8.GetBytes(aText);
     }
 
-    public static Byte[] EncodeVectorString(List<String> aList)
+    internal static byte[] EncodeVectorstring(List<string> aList)
     {
-      Byte[] values = new Byte[0];
+      byte[] values = new byte[0];
 
-      foreach (String s in aList)
+      foreach (string s in aList)
       {
-        Byte[] bytes = EncodeString(s);
-        Byte[] newArray = new Byte[values.Length + bytes.Length];
+        byte[] bytes = EncodeString(s);
+        byte[] newArray = new byte[values.Length + bytes.Length];
         values.CopyTo(newArray, 0);
         bytes.CopyTo(newArray, values.Length);
         values = newArray;
       }
 
-      Byte[] result = new Byte[values.Length + 1];
+      byte[] result = new byte[values.Length + 1];
       values.CopyTo(result, 0);
-      result[values.Length] = (Byte)0;
+      result[values.Length] = (byte)0;
 
       return result;
     }
 
-    public static UInt64 NewPingType(Byte[] aPingName, bool aIncludeClientId, bool aSendIfEmpty,
-                              Byte[] aReasonCodes, Int32 aReasonCodesLen)
+    internal static UInt64 NewPingType(string aPingName, byte aIncludeClientId, byte aSendIfEmpty,
+                                     List<string> aReasonCodes, int aReasonCodesLen)
     {
-      return glean_new_ping_type(aPingName, aIncludeClientId, aSendIfEmpty, aReasonCodes, aReasonCodesLen);
+      string[] reasons = aReasonCodes.ToArray();
+      return glean_new_ping_type(aPingName, aIncludeClientId, aSendIfEmpty, reasons, aReasonCodesLen);
     }
 
-    public static void RegisterPingType(UInt64 aPingTypeHandle)
+    internal static bool GleanSubmitPingByName(string aPingName, string aReason)
+    {
+      return glean_submit_ping_by_name(aPingName, aReason) != 0;
+    }
+
+    internal static bool GleanIsFirstRun()
+    {
+      return glean_is_first_run() != 0;
+    }
+
+    internal static bool GleanOnReadyToSubmitPings()
+    {
+      return glean_on_ready_to_submit_pings() != 0;
+    }
+
+    internal static void GleanClearApplicationLifetimeMetrics()
+    {
+      glean_clear_application_lifetime_metrics();
+    }
+
+    internal static void RegisterPingType(UInt64 aPingTypeHandle)
     {
       glean_register_ping_type(aPingTypeHandle);
     }
+
+    internal static void GleanGetUploadTask(ref FfiPingUploadTask result, byte log_ping)
+    {
+      glean_get_upload_task(ref result, log_ping);
+    }  
 
     private const string _libFileName = "glean_ffi.dll";
   }
