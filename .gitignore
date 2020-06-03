@@ -20,6 +20,12 @@ raw_xcode*log
 /glean-core/ios/Pipfile.lock
 /glean-core/ios/.venv
 
+# C# stuff.
+/glean-core/csharp/demo/.vs/
+/glean-core/csharp/glean/obj/
+/glean-core/csharp/demo/demo/obj/
+/glean-core/csharp/glean/bin/x64/Debug/
+
 # Due to a bug in Carthage, we ignore this file.
 # See `tests-only-Cartfile` for more info.
 /Cartfile
@@ -42,8 +48,4 @@ samples/ios/app/.venv/
 .coverage
 htmlcov/
 *.log
-glean-core/csharp/demo/.vs/
-glean-core/csharp/glean/obj/
-glean-core/csharp/demo/demo/obj/
 glean-core/csharp/demo/demo/bin/x64/Debug/
-glean-core/csharp/glean/bin/x64/Debug/
