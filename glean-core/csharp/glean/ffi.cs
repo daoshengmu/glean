@@ -15,7 +15,7 @@ namespace Glean {
     private static extern byte glean_initialize(FfiConfiguration cfg);
 
     [StructLayout(LayoutKind.Sequential)]
-    internal class FfiConfiguration
+    internal sealed class FfiConfiguration
     {
       internal string data_dir;
       internal string package_name;
@@ -58,7 +58,7 @@ namespace Glean {
     private static extern void glean_get_upload_task(ref FfiPingUploadTask result, byte log_ping);
 
 
-    internal class Constants
+    internal sealed class Constants
     {
       // A recoverable error.
       static internal int UPLOAD_RESULT_RECOVERABLE = 0x1;
@@ -169,7 +169,7 @@ namespace Glean {
       glean_get_upload_task(ref result, log_ping);
     }  
 
-    private const string _libFileName = "glean_ffi.dll";
+    private const string _libFileName = "lib/glean_ffi.dll";
   }
 
 }

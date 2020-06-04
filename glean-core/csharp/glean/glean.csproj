@@ -15,6 +15,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="lib\glean_ffi.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="YamlDotNet" Version="8.1.1" />
   </ItemGroup>
