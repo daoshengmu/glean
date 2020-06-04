@@ -2,7 +2,7 @@
 using System;
 using System.Diagnostics;
 using Glean;
-using GleanSDK = Glean.Glean;
+using static Glean.Glean;
 
 namespace demo
 {
@@ -12,7 +12,7 @@ namespace demo
     {
       Console.WriteLine("Hello World!");
 
-      GleanSDK.Initialize(
+      GleanInstance.Initialize(
         "fxrpc",
         "0.1.1",
         true,
@@ -22,8 +22,8 @@ namespace demo
         "data"
       );
 
-      GleanSDK.SetUploadEnabled(true);
-      bool enabled = GleanSDK.IsUploadEnabled();
+      GleanInstance.SetUploadEnabled(true);
+      bool enabled = GleanInstance.IsUploadEnabled();
 
       // Using BuildIn.cs
       var metrics = Loader.LoadMetrics("metrics.yaml");

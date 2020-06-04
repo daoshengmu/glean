@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Glean {
-  internal class Ffi {
+  internal sealed class Ffi {
 
     [DllImport(_libFileName)]
     private static extern void glean_enable_logging();

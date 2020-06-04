@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-
+using static Glean.Glean;
 
 namespace Glean.Net
 {
@@ -48,9 +48,9 @@ namespace Glean.Net
           Console.Error.WriteLine("Error while parsing headers for ping $documentId");
         }
 
-        if (Glean.configuration.pingTag != null)
+        if (GleanInstance.configuration.pingTag != null)
         {
-          headers.Add(new KeyValuePair<string, string>("X-Debug-ID", Glean.configuration.pingTag));
+          headers.Add(new KeyValuePair<string, string>("X-Debug-ID", GleanInstance.configuration.pingTag));
         }
 
         return headers;

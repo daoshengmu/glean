@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Glean
 {
-  public class Configuration {
+  public sealed class Configuration {
     public const string DEFAULT_TELEMETRY_ENDPOINT = "https://incoming.telemetry.mozilla.org";
     // The default number of events to store before sending
     public const int DEFAULT_MAX_EVENTS = 500;

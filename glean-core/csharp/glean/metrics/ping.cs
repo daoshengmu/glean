@@ -1,8 +1,7 @@
 ﻿using Glean;
 using System;
 using System.Collections.Generic;
-//using System.Collections.Generic;
-//using System.Linq;
+using static Glean.Glean;
 
 namespace Glean.Metrics
 {
@@ -26,7 +25,7 @@ namespace Glean.Metrics
         aReasonCodes.Count);
 
       // TODO:
-      Glean.RegisterPingType(this);
+      GleanInstance.RegisterPingType(this);
     }
 
     internal UInt64 Handle()
@@ -48,7 +47,7 @@ namespace Glean.Metrics
         reasonString = _reasonCodes[(int)reason];
       }
 
-      Glean.SubmitPing(this, reasonString);
+      GleanInstance.SubmitPing(this, reasonString);
     }
   }
 }

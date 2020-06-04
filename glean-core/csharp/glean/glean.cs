@@ -11,21 +11,29 @@ using Glean.Net;
 
 namespace Glean
 {
-  public class Glean {
-    private static bool _initialized = false;
-    private static string _dataDir = "";
-    private static bool _uploadEnabled = false;
+  public sealed class Glean {
+    private bool _initialized = false;
+    private string _dataDir = "";
+    private bool _uploadEnabled = false;
 
-    internal static Configuration configuration;
+    internal Configuration configuration;
 
-    private static bool _destroyDataDir;
-    private static string _applicationId;
-    private static string _applicationVersion;
-    internal static BaseUploader pingUploader;
+    private bool _destroyDataDir;
+    private string _applicationId;
+    private string _applicationVersion;
+    internal BaseUploader pingUploader;
 
-    private static List<PingType> _ping_type_queue = new List<PingType>();
+    private List<PingType> _ping_type_queue = new List<PingType>();
 
-    public static void Initialize(string aApplicationId, string aApplicationVersion,
+    private Glean() { }
+
+    // Initialize the singleton using the `Lazy` facilities.
+    private static readonly Lazy<Glean>
+      lazy = new Lazy<Glean>(() => new Glean());
+    public static Glean GleanInstance => lazy.Value;
+
+
+    public void Initialize(string aApplicationId, string aApplicationVersion,
       bool aUploadEnabled, Configuration aConfiguration = null, string aDataDir = null) {
 
       if (aConfiguration == null) {
@@ -94,7 +102,7 @@ namespace Glean
       Dispatcher.FlushQueuedInitialTasks();
     }
 
-    internal static void RegisterPingType(PingType aPing)
+    internal void RegisterPingType(PingType aPing)
     {
       if (_initialized)
       {
@@ -102,28 +110,28 @@ namespace Glean
       }
     }
 
-    public static string GetDataDir()
+    public string GetDataDir()
     {
       return _dataDir;
     }
 
-    public static void SetUploadEnabled(bool aEnable)
+    public void SetUploadEnabled(bool aEnable)
     {
       Ffi.GleanSetUploadEnabled(aEnable ? (byte)1 : (byte)0);
     }
 
-    public static bool IsUploadEnabled()
+    public bool IsUploadEnabled()
     {
       return Ffi.GleanIsUploadEnabled() > 0;
     }
 
-    internal static void SubmitPing(PingType aPing, string aReason = null)
+    internal void SubmitPing(PingType aPing, string aReason = null)
     {
       _SubmitPingsByName(aPing.Name(), aReason);
     }
 
     // TODO: support PingUploadWorker.Process();
-    private static void _SubmitPingsByName(string aPingName, string aReason = null)
+    private void _SubmitPingsByName(string aPingName, string aReason = null)
     {
       if (_initialized == false) {
         Console.Error.WriteLine("Glean must be initialized before submitting pings.");
@@ -144,7 +152,7 @@ namespace Glean
       }
     }
 
-    private static void _InitializeCoreMetrics()
+    private void _InitializeCoreMetrics()
     {
       CultureInfo ci = CultureInfo.InstalledUICulture;
 

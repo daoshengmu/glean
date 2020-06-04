@@ -2,6 +2,7 @@
 using Glean.Net;
 using System;
 using static Glean.Net.FfiPingUploadTask;
+using static Glean.Glean;
 
 namespace Glean.Scheduler
 {
@@ -42,18 +43,18 @@ namespace Glean.Scheduler
       do
       {
         var incomingTask = new FfiPingUploadTask();
-        byte logPings = Glean.configuration.logPings == true ? (byte)1 : (byte)0;
+        byte logPings = GleanInstance.configuration.logPings == true ? (byte)1 : (byte)0;
         Ffi.GleanGetUploadTask(ref incomingTask, logPings);
 
         var action = incomingTask.ToPingUploadTask();
         if (action.GetType() == typeof(PingUploadTaskUpload))
         {
           var uploadAction = (PingUploadTaskUpload)action;
-          var result = Glean.pingUploader.DoUpload(
+          var result = GleanInstance.pingUploader.DoUpload(
                         uploadAction.request.path,
                         uploadAction.request.body,
-                        uploadAction.request.headers,                      
-                        Glean.configuration);
+                        uploadAction.request.headers,
+                        GleanInstance.configuration);
 
         } else if (action.GetType() == typeof(PingUploadTaskWait))
         {
