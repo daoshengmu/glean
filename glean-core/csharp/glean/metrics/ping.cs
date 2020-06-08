@@ -20,7 +20,7 @@ namespace Glean.Metrics
       _sendIfEmpty = aSendIfEmpty;
       _reasonCodes = aReasonCodes;
       
-      _handle = Ffi.NewPingType(aName, aIncludeClientId == true ? (byte)1 : (byte)0,
+      _handle = LibGleanFFI.NewPingType(aName, aIncludeClientId == true ? (byte)1 : (byte)0,
                                 aSendIfEmpty == true ? (byte)1 : (byte)0, aReasonCodes,
         aReasonCodes.Count);
 

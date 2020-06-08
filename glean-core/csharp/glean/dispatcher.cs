@@ -17,15 +17,14 @@ namespace Glean
     private static List<Tuple<TaskDelelgate, List<string>, Dictionary<string, string>>>
       _preinitTaskQueue = new List<Tuple<TaskDelelgate, List<string>, Dictionary<string, string>>>();
 
-    internal delegate void LanuchDelegate();
     internal delegate void TaskDelelgate(List<string> aArg, Dictionary<string, string> aKwargs);
 
-    internal static void Launch(LanuchDelegate aFunc)
+    internal static void Launch(Action aFunc)
     {
       aFunc();
     }
 
-    internal static void LaunchAtFront(LanuchDelegate aFunc)
+    internal static void LaunchAtFront(Action aFunc)
     {
       aFunc();
     }
@@ -33,6 +32,11 @@ namespace Glean
     internal static bool IsTestingMode()
     {
       return _testingMode;
+    }
+
+    internal static void AssertInTestingMode()
+    {
+
     }
 
     internal static void FlushQueuedInitialTasks()

@@ -13,7 +13,7 @@ namespace Glean
     public string serverEndpoint = DEFAULT_TELEMETRY_ENDPOINT;
     public string agent = null;
     public string channel = null;
-    public int maxEvents = DEFAULT_MAX_EVENTS;
+    public int? maxEvents = null;
     public bool logPings = false;
     public string pingTag = null;
     internal BaseUploader pingUploader = null;
@@ -22,7 +22,7 @@ namespace Glean
 
     public Configuration(string aServerEndpoint = DEFAULT_TELEMETRY_ENDPOINT,
                          string aUserAgent = null, string aChannel = null,
-                         int aMaxEvents = DEFAULT_MAX_EVENTS, bool aLogPings = false,
+                         int? aMaxEvents = null, bool aLogPings = false,
                          string aPingTag = null, BaseUploader aPingUpload = null,
                          bool aAllowMultiProcessing = true) {
 

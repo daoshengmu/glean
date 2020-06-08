@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using static Glean.Ffi;
+using static Glean.LibGleanFFI;
 
 namespace Glean.Net
 {

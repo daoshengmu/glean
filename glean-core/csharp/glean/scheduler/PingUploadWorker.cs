@@ -44,7 +44,7 @@ namespace Glean.Scheduler
       {
         var incomingTask = new FfiPingUploadTask();
         byte logPings = GleanInstance.configuration.logPings == true ? (byte)1 : (byte)0;
-        Ffi.GleanGetUploadTask(ref incomingTask, logPings);
+        LibGleanFFI.GleanGetUploadTask(ref incomingTask, logPings);
 
         var action = incomingTask.ToPingUploadTask();
         if (action.GetType() == typeof(PingUploadTaskUpload))

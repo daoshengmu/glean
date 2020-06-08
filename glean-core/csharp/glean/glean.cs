@@ -7,7 +7,10 @@ using System.IO;
 using System.Runtime.InteropServices;
 using Glean.Scheduler;
 using Glean.Metrics;
+using Glean.Metrics.ManualMetrics;
 using Glean.Net;
+
+using static Glean.Metrics.ManualMetrics.GleanInternalMetricsOuter;
 
 namespace Glean
 {
@@ -45,10 +48,11 @@ namespace Glean
       _applicationId = aApplicationId;
       _applicationVersion = aApplicationVersion;
       _uploadEnabled = aUploadEnabled;
-        
-      Ffi.FfiConfiguration cfg = Ffi.MakeConfig(aDataDir, aApplicationId, aUploadEnabled, Configuration.DEFAULT_MAX_EVENTS);
 
-      _initialized = Ffi.GleanInitialize(cfg);
+      LibGleanFFI.FfiConfiguration cfg = LibGleanFFI.MakeConfig(aDataDir, aApplicationId,
+        aUploadEnabled, aConfiguration.maxEvents);
+
+      _initialized = LibGleanFFI.GleanInitialize(cfg);
 
       Console.WriteLine("Glean initialize: " + _initialized);
 
@@ -58,7 +62,7 @@ namespace Glean
         Console.Error.WriteLine("Glean initialization is failed");
         return;
       }
-      
+
       if (aDataDir == null)
       {
         aDataDir = Path.GetTempFileName();
@@ -75,14 +79,14 @@ namespace Glean
         RegisterPingType(ping);
       }
 
-      var isFirstRun = Ffi.GleanIsFirstRun();
+      var isFirstRun = LibGleanFFI.GleanIsFirstRun();
       if (isFirstRun)
       {
         _InitializeCoreMetrics();
-      } 
-      
-      var pingSubmitted = Ffi.GleanOnReadyToSubmitPings();
-     
+      }
+
+      var pingSubmitted = LibGleanFFI.GleanOnReadyToSubmitPings();
+
       // TODO: Implement PingUpload worker threads
       // We need to enqueue the PingUploadWorker in these cases:
       // 1. Pings were submitted through Glean and it is ready to upload those pings;
@@ -94,7 +98,7 @@ namespace Glean
 
       if (!isFirstRun)
       {
-        Ffi.GleanClearApplicationLifetimeMetrics();
+        LibGleanFFI.GleanClearApplicationLifetimeMetrics();
         _InitializeCoreMetrics();
       }
 
@@ -106,7 +110,7 @@ namespace Glean
     {
       if (_initialized)
       {
-        Ffi.RegisterPingType(aPing.Handle());
+        LibGleanFFI.RegisterPingType(aPing.Handle());
       }
     }
 
@@ -117,12 +121,12 @@ namespace Glean
 
     public void SetUploadEnabled(bool aEnable)
     {
-      Ffi.GleanSetUploadEnabled(aEnable ? (byte)1 : (byte)0);
+      LibGleanFFI.GleanSetUploadEnabled(aEnable ? (byte)1 : (byte)0);
     }
 
     public bool IsUploadEnabled()
     {
-      return Ffi.GleanIsUploadEnabled() > 0;
+      return LibGleanFFI.GleanIsUploadEnabled() > 0;
     }
 
     internal void SubmitPing(PingType aPing, string aReason = null)
@@ -144,7 +148,7 @@ namespace Glean
         return;
       }
 
-      var sentPing = Ffi.GleanSubmitPingByName(aPingName, aReason);
+      var sentPing = LibGleanFFI.GleanSubmitPingByName(aPingName, aReason);
 
       if (sentPing == true)
       {
@@ -155,6 +159,15 @@ namespace Glean
     private void _InitializeCoreMetrics()
     {
       CultureInfo ci = CultureInfo.InstalledUICulture;
+
+      // Testing manual metrics
+      Console.WriteLine("Setting metric");
+      GleanInternalMetrics.architecture.SetSync("test");
+      Console.WriteLine("Check has value");
+      bool hasValue = GleanInternalMetrics.architecture.TestHasValue();
+      Console.WriteLine("Has value {0} ", hasValue);
+      string storedvalue = GleanInternalMetrics.architecture.TestGetValue();
+      Console.WriteLine("InitializeCoreMetrics - has value {0} and that's {1}", hasValue, storedvalue);
 
       // Read metric.yaml
       try

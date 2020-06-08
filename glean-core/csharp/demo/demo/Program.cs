@@ -17,7 +17,7 @@ namespace demo
         "0.1.1",
         true,
         new Glean.Configuration(
-        Glean.Configuration.DEFAULT_TELEMETRY_ENDPOINT, null, null, Glean.Configuration.DEFAULT_MAX_EVENTS, true,
+        Glean.Configuration.DEFAULT_TELEMETRY_ENDPOINT, null, null, null, true,
         "fxrpc-test-tag"),
         "data"
       );
