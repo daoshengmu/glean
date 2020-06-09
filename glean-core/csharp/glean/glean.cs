@@ -169,6 +169,16 @@ namespace Glean
       string storedvalue = GleanInternalMetrics.architecture.TestGetValue();
       Console.WriteLine("InitializeCoreMetrics - has value {0} and that's {1}", hasValue, storedvalue);
 
+
+      Console.WriteLine("Setting boolean metric");
+      GleanInternalMetrics.status.SetSync(true);
+      Console.WriteLine("Check has value");
+      hasValue = GleanInternalMetrics.status.TestHasValue();
+      Console.WriteLine("Has value {0} ", hasValue);
+      bool storedbool = GleanInternalMetrics.status.TestGetValue();
+      Console.WriteLine("InitializeCoreMetrics - has value {0} and that's {1}", hasValue, storedbool);
+
+
       // Read metric.yaml
       try
       {

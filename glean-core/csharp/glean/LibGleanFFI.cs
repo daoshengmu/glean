@@ -48,10 +48,6 @@ namespace Glean {
     internal static extern byte glean_submit_ping_by_name(string aPingName, string aReason);
 
     [DllImport(_libFileName)]
-    internal static extern StringAsReturnValue glean_string_test_get_value(
-                                                  UInt64 metric_id, string storage_name);
-
-    [DllImport(_libFileName)]
     internal static extern void glean_get_upload_task(ref FfiPingUploadTask aUploadTask);
 
     [DllImport(_libFileName)]
@@ -80,7 +76,29 @@ namespace Glean {
     internal static extern byte glean_string_test_has_value(UInt64 metric_id, string value);
 
     [DllImport(_libFileName)]
+    internal static extern StringAsReturnValue glean_string_test_get_value(
+                                                 UInt64 metric_id, string storage_name);
+
+    [DllImport(_libFileName)]
     internal static extern void glean_destroy_string_metric(UInt64 handle);
+
+    [DllImport(_libFileName)]
+    internal static extern UInt64 glean_new_boolean_metric(string category,
+        string name, string[] send_in_pings, Int32 send_in_pings_len,
+        Lifetime lifetime, byte disabled);
+
+    [DllImport(_libFileName)]
+    internal static extern void glean_boolean_set(UInt64 metric_id, byte value);
+
+    [DllImport(_libFileName)]
+    internal static extern byte glean_boolean_test_has_value(UInt64 metric_id, string value);
+
+    [DllImport(_libFileName)]
+    internal static extern byte glean_boolean_test_get_value(UInt64 metric_id, string value);
+
+
+    [DllImport(_libFileName)]
+    internal static extern void glean_destroy_boolean_metric(UInt64 handle);
 
     internal sealed class Constants
     {
@@ -280,6 +298,33 @@ namespace Glean {
     }
 
     internal static void GleanDestroyStringMetric(UInt64 aHandle)
+    {
+      glean_destroy_string_metric(aHandle);
+    }
+
+    internal static UInt64 GleanNewBooleanMetric(string category,
+        string name, string[] send_in_pings, Int32 send_in_pings_len,
+        Lifetime lifetime, byte disabled) {
+      return glean_new_boolean_metric(category, name, send_in_pings, send_in_pings_len,
+        lifetime, disabled);
+    }
+
+    internal static void GleanBooleanSet(UInt64 handle, byte value)
+    {
+      glean_boolean_set(handle, value);
+    }
+
+    internal static bool GleanBooleanTestHasValue(UInt64 handle, string value)
+    {
+      return glean_boolean_test_has_value(handle, value) != 0;
+    }
+
+    internal static bool GleanBooleanTestGasValue(UInt64 handle, string value)
+    {
+      return glean_boolean_test_get_value(handle, value) != 0;
+    }
+
+    internal static void GleanDestroyBooleanMetric(UInt64 aHandle)
     {
       glean_destroy_string_metric(aHandle);
     }

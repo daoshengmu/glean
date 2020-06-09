@@ -24,5 +24,14 @@ namespace Glean.Metrics.ManualMetrics
         ));
 
     public StringMetricType architecture => architectureLazy.Value;
+    public BooleanMetricType status => statusLazy.Value;
+
+    private readonly Lazy<BooleanMetricType> statusLazy = new Lazy<BooleanMetricType>(() => new BooleanMetricType(
+         category: "",
+         disabled: false,
+         lifetime: Lifetime.Application,
+         name: "glean_new_boolean_metric",
+         sendInPings: new string[] { "glean_client_info" }
+     ));
   }
 }

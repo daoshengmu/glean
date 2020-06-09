@@ -49,3 +49,6 @@ samples/ios/app/.venv/
 htmlcov/
 *.log
 glean-core/csharp/demo/demo/bin/x64/Debug/
+glean-core/csharp/demo/demo/bin/_Debug/
+glean-core/csharp/glean/.vs/
+glean-core/csharp/GleanTests/bin/Debug/
